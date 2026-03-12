@@ -1,34 +1,3 @@
-// ============================================================
-//  Electrical Impedance Tomography (EIT) - Arduino Uno
-//  Hardware: AD5933 Impedance Analyzer + 2x 8-Channel MUX
-// ============================================================
-//
-//  CIRCUIT CONNECTIONS:
-//  ┌─────────────────────────────────────────────────────────┐
-//  │  AD5933                                                 │
-//  │    DVDD(9), AVDD1(10), AVDD2(11) → 3.3V                │
-//  │    DGND(12), AGND1(13), AGND2(14) → GND                │
-//  │    SDA(15) → A4  |  SCL(16) → A5                       │
-//  │    Vout(6) → MUX1 COM/Z  (Sender output)               │
-//  │    Vin(5)  → MUX2 COM/Z  (Receiver input)              │
-//  │                                                         │
-//  │  MUX 1 (Sender)                                         │
-//  │    S0/A → D2  |  S1/B → D3  |  S2/C → D4              │
-//  │    INH/E → GND  (always enabled - hardwired)            │
-//  │    CH0–CH7 → Probes P0–P7                               │
-//  │                                                         │
-//  │  MUX 2 (Receiver)                                       │
-//  │    S0/A → D5  |  S1/B → D6  |  S2/C → D7              │
-//  │    INH/E → GND  (always enabled - hardwired)            │
-//  │    CH0–CH7 → Probes P0–P7                               │
-//  └─────────────────────────────────────────────────────────┘
-//
-//  EIT SCAN PROTOCOL:
-//  - 8 probes (P0–P7), 56 unique sender/receiver pairs
-//  - Each pair: AD5933 performs frequency sweep
-//  - Real + Imaginary impedance data sent over Serial
-// ============================================================
-
 #include <Wire.h>
 
 // ─── MUX 1 Pin Definitions (Sender) ───────────────────────
@@ -95,7 +64,7 @@
 // Frequency increment: 1 kHz per step
 #define FREQ_INC_HZ         1000UL
 // Number of increments: 10 steps (sweep from 10 kHz to 20 kHz)
-#define NUM_INCREMENTS      10
+#define NUM_INCREMENTS      0
 // Settling cycles before measurement
 #define SETTLING_CYCLES     15
 
@@ -257,12 +226,18 @@ void runFrequencySweep(uint8_t sender, uint8_t receiver) {
     double impedance = (data.magnitude > 0.0) ? (gainFactor / data.magnitude) : 0.0;
 
     // Output CSV: sender, receiver, freq, real, imag, magnitude, phase
-    Serial.print(sender);       Serial.print(',');
-    Serial.print(receiver);     Serial.print(',');
-    Serial.print(currentFreq);  Serial.print(',');
-    Serial.print(data.real);    Serial.print(',');
-    Serial.print(data.imag);    Serial.print(',');
-    Serial.print(impedance, 4); Serial.print(',');
+    Serial.print(sender);       
+    Serial.print(',');
+    Serial.print(receiver);     
+    Serial.print(',');
+    Serial.print(currentFreq);  
+    Serial.print(',');
+    Serial.print(data.real);    
+    Serial.print(',');
+    Serial.print(data.imag);    
+    Serial.print(',');
+    Serial.print(impedance, 15); 
+    Serial.print(',');
     Serial.println(data.phase_deg, 4);
 
     // Move to next frequency (unless last step)
